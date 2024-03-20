@@ -19,13 +19,19 @@ $ docker network create --subnet=182.17.0.0/16 sina_bot_net
 $ docker run --net sina_bot_net --ip 182.17.0.10 -d -p 6379:6379 -v %cd%/data:/data redis
 ```
 
-3. Build the `sina_bot` image:
+3. Modify `spiders/sina_spider:line 23` to:
+
+```
+23:    r = connect_to_redis("182.17.0.10")
+```
+
+4. Build the `sina_bot` image:
 
 ```
 $ docker build . -t sina_bot:v2
 ```
 
-4. Run the `sina_bot` container:
+5. Run the `sina_bot` container:
 
 ```
 $ docker run --net sina_bot_net --ip 182.17.0.11 -d -p 9090:9090 -v %cd%:/sina_bot sina_bot:v2
@@ -33,19 +39,14 @@ $ docker run --net sina_bot_net --ip 182.17.0.11 -d -p 9090:9090 -v %cd%:/sina_b
 
 ## Build with local environment
 
-1. First, modify `spiders/sina_spider:line 23` to:
 
-```
-23:    r = connect_to_redis()
-```
-
-2. Start redis (through docker or installation):
+1. Start redis (through docker or installation):
 
 ```
 $ docker run -d -p 6379:6379 redis
 ```
 
-3. Then execute the `run.py`:
+2. Then execute the `run.py`:
 
 ```
 $ python3 run.py
