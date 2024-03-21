@@ -4,7 +4,7 @@ from sina_bot.items import SinaBotItem
 
 class SinaSpiderSpider(scrapy.Spider):
     name = "sina_spider"
-    # allowed_domains = ["www.sina.com.cn"]  Comment this line to disable cross-site filter.
+    # allowed_domains = ["www.sina.com.cn"]  # Comment this line to disable cross-site filter.
     start_urls = ["https://www.sina.com.cn"]
     finished = 0
 

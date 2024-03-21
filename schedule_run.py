@@ -1,10 +1,13 @@
 import subprocess
 import schedule
 import time
+import sys
 
+
+spider_name = ""
 
 def job():
-    res = subprocess.run(["python3", "run.py", "sina_incremental_spider"], stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True)
+    res = subprocess.run(["python3", "run.py", spider_name], stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True)
     date_str = time.strftime("%Y%m%d", time.localtime())
     log_file_name = f"logs/log_{date_str}.txt"
 
@@ -17,6 +20,8 @@ def job():
 
 
 if __name__ == '__main__':
+    spider_name = "sina_spider" if len(sys.argv) <= 1 else sys.argv[1]
+
     # schedule.every(10).minutes.do(job)
     schedule.every(5).seconds.do(job)
 
