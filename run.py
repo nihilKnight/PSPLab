@@ -6,9 +6,9 @@ import sys
 
 def format_news_piece(piece: dict):
     return "\n".join([
-        "新闻标题：" + piece['title'][0],
-        "新闻日期：" + piece['date'][0],
-        "新闻内容：", '\n'.join(piece['content'])
+        piece['title'][0],
+        piece['date'][0],
+        "\n".join(piece['content'])
     ])
 
 def convert_json_to_txt(path: str, json_file_name: str):
