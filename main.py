@@ -22,7 +22,7 @@ if __name__ == "__main__":
     parser.add_argument("-o", "--output_path", action="store", nargs="?", help=
                         "The path where the output document(.docx or .pdf) stored. Default to output a .docx with the same name as input in the `outputs/` dir.")
     parser.add_argument("-c", "--wordcounting_path", action="store", help=
-                        "The path where the file(.docx) to conduct word counting.")
+                        "The path where the file(.docx) to conduct word counting. Output a .png with the same name as input in the `figs/` dir.")
     parser.add_argument("-m", "--wordmarking_path", action="store", help=
                         "The path where the file to conduct word marking.")
     args = parser.parse_args()
