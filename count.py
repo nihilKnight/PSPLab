@@ -7,7 +7,7 @@ from docx import Document
 
 
 font_path = "fonts/SourceHanSansCN-Normal.otf"
-fig_dir = "figs/"
+output_fig_dir = "figs/"
 
 def count(wordcounting_path: str):
     doc = Document(wordcounting_path)
@@ -27,4 +27,4 @@ def count(wordcounting_path: str):
     })
     df.sort_values("frequency", inplace=True, ascending=False)
     wordcloud = WordCloud(width=1200, height=800, max_font_size=80, max_words=300, font_path=font_path, background_color="white").generate(' '.join(list(df["word"])))
-    wordcloud.to_file(fig_dir + os.path.split(wordcounting_path)[-1].split(".")[0] + ".png")
+    wordcloud.to_file(output_fig_dir + os.path.split(wordcounting_path)[-1].split(".")[0] + ".png")
