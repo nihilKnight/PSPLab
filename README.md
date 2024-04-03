@@ -8,6 +8,8 @@
 
 - Conduct document tokenizing taking `.docx` as input and outputing an tokenized `.docx` according to a sensitive wordlist.
 
+This collector is written for the BUAA-SCST PSP Lab.
+
 ## Quickstart 
 
 ```
