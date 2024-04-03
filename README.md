@@ -4,7 +4,7 @@
 
 A crawling bot for [sina news](https://www.sina.com.cn), enabling **Cycle**, **Incremental**, **Multi-page** crawling. 
 
-This bot is written for the BUAA-SCST PPS Lab.
+This bot is written for the BUAA-SCST PSP Lab.
 
 ## QuickStart
 
