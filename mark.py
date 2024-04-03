@@ -37,7 +37,6 @@ def mark(wordmarking_path: str):
             if marker.search(word):
                 run.bold = True
                 run.font.highlight_color = WD_COLOR_INDEX.YELLOW
-        para_marked.add_run("\n")
     
     doc_marked.save(output_dir + os.path.split(wordmarking_path)[-1].split(".")[0] + "_marked.docx")
 
