@@ -1,7 +1,6 @@
 import os
 import jieba
 import pandas as pd
-import matplotlib.pyplot as plt
 
 from wordcloud import WordCloud
 from docx import Document
@@ -27,5 +26,5 @@ def count(wordcounting_path: str):
         "frequency": [item[1] for item in wordlist.items()]
     })
     df.sort_values("frequency", inplace=True, ascending=False)
-    wordcloud = WordCloud(max_font_size=80, max_words=300, font_path=font_path, background_color="white").generate(' '.join(list(df["word"])))
+    wordcloud = WordCloud(width=1200, height=800, max_font_size=80, max_words=300, font_path=font_path, background_color="white").generate(' '.join(list(df["word"])))
     wordcloud.to_file(fig_dir + os.path.split(wordcounting_path)[-1].split(".")[0] + ".png")

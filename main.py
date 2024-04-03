@@ -6,6 +6,7 @@ import re
 
 from make import make_docx, make_pdf
 from count import count
+from mark import mark
 from excep import InputTypeMismatchException, OutputTypeMismatchException
 
 
@@ -80,6 +81,9 @@ if __name__ == "__main__":
     # else:
     #     make_pdf(output_path, articles)
 
-    wordcounting_path = args.wordcounting_path
-    count(wordcounting_path)
+    # wordcounting_path = args.wordcounting_path
+    # count(wordcounting_path)
+
+    wordmarking_path = args.wordmarking_path
+    mark(wordmarking_path)
 
