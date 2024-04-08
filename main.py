@@ -1,10 +1,10 @@
-from syseff import SysInfoType, SystemEfficiency
+from sys_info import SysInfoType, SystemInfo
 
 
-output_path = "outputs/syseff.txt"
+output_path = "outputs/sys_info.txt"
 
 if __name__ == "__main__":
-    se = SystemEfficiency()
+    se = SystemInfo()
     se.format_to_file(output_path, SysInfoType.CPU)
     se.format_to_file(output_path, SysInfoType.RAM, "a")
     se.format_to_file(output_path, SysInfoType.DISK, "a")

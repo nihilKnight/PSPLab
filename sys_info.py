@@ -14,8 +14,8 @@ class SysInfoType(Enum):
     OTHER = 4
 
 
-class SystemEfficiency:
-    def __init__(self) -> None:
+class SystemInfo:
+    def __init__(self, is_unix=False) -> None:
         self.cpu = psutil.cpu_times_percent(interval=1)
         self.vir_mem = psutil.virtual_memory()
         self.swap_mem = psutil.swap_memory()
@@ -23,15 +23,16 @@ class SystemEfficiency:
         self.net = psutil.net_io_counters()
         self.users = psutil.users()
         self.time = psutil.boot_time()
+        # whether or not the system is unix-like.
+        self.is_unix = is_unix
 
         self.cpu_banner = "CPU Efficiency Information"
         self.cpu_info = [
             ("Name", "Value"),
             ("user_time", str(self.cpu.user) + "%"),
             ("sys_time", str(self.cpu.system) + "%"),
-            # ("wait_io", str(self.cpu.iowait) + "%"),
             ("idle", str(self.cpu.idle) + "%")
-        ]
+        ] + ( [("wait_io", str(self.cpu.iowait) + "%")] if self.is_unix else [] ) 
 
         self.ram_banner = "Ram Efficiency Information"
         self.ram_info = [
@@ -39,10 +40,8 @@ class SystemEfficiency:
             ("total", giga_bytes(self.vir_mem.total)),
             ("used", giga_bytes(self.vir_mem.used)),
             ("free", million_bytes(self.vir_mem.free)),
-            # ("buffers", million_bytes(self.vir_mem.buffers)),
-            # ("cached", million_bytes(self.vir_mem.cached)),
             ("swap_used", million_bytes(self.swap_mem.used))
-        ]
+        ] + ( [("buffers", million_bytes(self.vir_mem.buffers)), ("cached", million_bytes(self.vir_mem.cached))] if self.is_unix else [] )
         
         self.disk_banner = "Disk Efficiency Information"
         self.disk_info = [
@@ -88,6 +87,7 @@ class SystemEfficiency:
             case SysInfoType.OTHER:
                 banner = self.other_banner
                 info = self.other_info
+        # output the efficiency to file.
         with open(file_path, mode, encoding="UTF-8") as file:
             file.write(gen_cell_line([banner], line_width))
             for i in info:
