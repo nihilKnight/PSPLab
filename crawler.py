@@ -1,9 +1,8 @@
 import requests
 
-import constant
-
 from bs4 import BeautifulSoup
 from urllib.parse import urlparse, urljoin
+from constant import constant
 
 
 class SubDirCrawler:

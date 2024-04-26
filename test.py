@@ -1,4 +1,5 @@
 
+from urllib.parse import urljoin
 from crawler import SubDirCrawler
 
 
@@ -11,3 +12,4 @@ if __name__ == "__main__":
     except StopIteration:
         pass
 
+    # print(urljoin("http://hello.com/", "some/", "word.txt"))
