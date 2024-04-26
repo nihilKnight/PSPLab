@@ -1,8 +1,10 @@
-import time
+import constant
 
-from colored_print import colored_print
+from scanner import ScanMode, Scanner
 
 
 if __name__ == "__main__":
-    pass
+    targets = ["https://bilibili.com"]
+    s = Scanner(targets, constant.STATIC_DICT_PATH, ScanMode.Static)
+    s.scan(constant.OUTPUT_DIR)
 
