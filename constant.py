@@ -10,3 +10,4 @@ class constant:
     DEFAULT_COLOR_LABEL = "1;32;40"
     WAITING_COLOR_LABEL = "1;36;40"
     TERMINAL_WIDTH = os.get_terminal_size().columns
+    MAX_THREADS = 64

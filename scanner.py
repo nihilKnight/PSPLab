@@ -23,9 +23,9 @@ class Scanner:
         self.targets = targets
         self.static_dict_path = static_dict_path
         self.mode = ScanMode.Dynamic if is_dyn else ScanMode.Static
-        if threads > 80:
+        if threads > constant.MAX_THREADS:
             print("To large threads might cause too many http connections are kept at the same time.")
-            self.threads = 80
+            self.threads = constant.MAX_THREADS
         else:
             self.threads = threads
         self.lock = threading.Lock()
