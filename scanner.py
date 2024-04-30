@@ -19,12 +19,13 @@ class ScanMode(Enum):
 
 class Scanner:
 
-    def __init__(self, targets: list[str], static_dict_path: str, mode=ScanMode.Static ,threads=128) -> None:
+    def __init__(self, targets: list[str], static_dict_path=constant.STATIC_DICT_PATH, is_dyn=False ,threads=128, dynamic_depth=3) -> None:
         self.targets = targets
         self.static_dict_path = static_dict_path
-        self.mode = mode
+        self.mode = ScanMode.Static if is_dyn else ScanMode.Dynamic
         self.threads = threads
         self.lock = threading.Lock()
+        self.dynamic_depth = dynamic_depth
 
     def static_generator(self, target: str):
         with open(self.static_dict_path, "r", encoding="utf-8") as dp:
@@ -36,14 +37,17 @@ class Scanner:
                         yield target + word + ext
 
     def dynamic_generator(self, target: str):
-        subdir_gen = chain([""], SubDirCrawler().recursive_parse(target))
+        subdir_gen = chain([""], SubDirCrawler(self.dynamic_depth).recursive_parse(target))
         with open(self.static_dict_path, "r", encoding="utf-8") as dp:
             while True:
                 try:
                     subdir = next(subdir_gen)
                     dp_ = dp
                     for line in dp_:
-                        word = line.strip().strip("/")
+                        # skip dirs.
+                        if "/" in line:
+                            continue
+                        word = line.strip()
                         yield urljoin(target, subdir) + word
                         if "." not in word:
                             for ext in constant.EXTS:
@@ -63,7 +67,7 @@ class Scanner:
         except Exception as e:
             print(e)
 
-    def scan(self, output_dir: str) -> None:
+    def scan(self, output_dir=constant.OUTPUT_DIR) -> None:
         print("[+] mode: " + ("static" if self.mode == ScanMode.Static else "dynamic"))
         print("[+] threads: " + str(self.threads))
         print("[+] output directory: " + output_dir)
@@ -71,14 +75,15 @@ class Scanner:
         for target in self.targets:
             print("[+] scanning target: " + target + "...")
             gen = self.static_generator(target) if self.mode == ScanMode.Static else self.dynamic_generator(target)
-            output = os.path.join(output_dir, "dyn_target" + ".txt")
+            save_name = target.split("/")[2].replace(".", "_") + ("_static" if self.mode == ScanMode.Static else "_dynamic") + ".txt"
+            output = os.path.join(output_dir, save_name)
             with open(output, "w", encoding="utf-8") as op:
-                with ThreadPoolExecutor(max_workers=self.threads) as executor:
+                with ThreadPoolExecutor(max_workers=self.threads) as executor, ThreadPoolExecutor(max_workers=16) as printer:
                     while True:
                         try:
                             url = next(gen)
                             res = executor.submit(self.url_test_and_write, url, op)
-                            executor.submit(waiting, res, url)
+                            printer.submit(waiting, res, url)
                         except StopIteration:
                             break
                         except Exception as e:
