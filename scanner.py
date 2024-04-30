@@ -48,9 +48,6 @@ class Scanner:
                     subdir = next(subdir_gen)
                     dp_ = dp
                     for line in dp_:
-                        # skip dirs.
-                        if "/" in line:
-                            continue
                         word = line.strip()
                         yield urljoin(target, subdir) + word
                         if "." not in word:
