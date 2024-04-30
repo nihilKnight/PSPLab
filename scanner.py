@@ -59,10 +59,10 @@ class Scanner:
     
     def url_test_and_write(self, url: str, op: io.TextIOWrapper) -> None:
         try:
-            req = requests.get(url=url, headers={"User-Agent": constant.USER_AGENT})
-            if req.status_code not in constant.BANNED_STAT:
+            status_code = requests.get(url=url, headers={"User-Agent": constant.USER_AGENT}).status_code
+            if status_code not in constant.BANNED_STAT:
                 self.lock.acquire()
-                colored_print(f"[-] {req.status_code} ==> {url}")
+                colored_print(f"[-] {status_code} ==> {url}")
                 op.write(url + "\n")
                 self.lock.release()
         except Exception as e:
