@@ -1,7 +1,6 @@
 import argparse
 
-from scanner import ScanMode, Scanner
-from constant import constant
+from scanner import Scanner
 
 
 if __name__ == "__main__":
