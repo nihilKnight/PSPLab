@@ -19,11 +19,15 @@ class ScanMode(Enum):
 
 class Scanner:
 
-    def __init__(self, targets: list[str], static_dict_path=constant.STATIC_DICT_PATH, is_dyn=False ,threads=128, dynamic_depth=3) -> None:
+    def __init__(self, targets: list[str], static_dict_path=constant.STATIC_DICT_PATH, is_dyn=False ,threads=64, dynamic_depth=3) -> None:
         self.targets = targets
         self.static_dict_path = static_dict_path
-        self.mode = ScanMode.Static if is_dyn else ScanMode.Dynamic
-        self.threads = threads
+        self.mode = ScanMode.Dynamic if is_dyn else ScanMode.Static
+        if threads > 80:
+            print("To large threads might cause too many http connections are kept at the same time.")
+            self.threads = 80
+        else:
+            self.threads = threads
         self.lock = threading.Lock()
         self.dynamic_depth = dynamic_depth
 
@@ -78,7 +82,7 @@ class Scanner:
             save_name = target.split("/")[2].replace(".", "_") + ("_static" if self.mode == ScanMode.Static else "_dynamic") + ".txt"
             output = os.path.join(output_dir, save_name)
             with open(output, "w", encoding="utf-8") as op:
-                with ThreadPoolExecutor(max_workers=self.threads) as executor, ThreadPoolExecutor(max_workers=16) as printer:
+                with ThreadPoolExecutor(max_workers=self.threads) as executor, ThreadPoolExecutor(max_workers=self.threads/2) as printer:
                     while True:
                         try:
                             url = next(gen)
