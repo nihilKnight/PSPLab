@@ -26,9 +26,11 @@ if __name__ == "__main__":
     students = msc.select_all_students()
     courses = msc.select_all_courses()
 
+    print()
     for stu in students:
         print(stu)
 
     for cour in courses:
         print(cour)
+    print()
 
