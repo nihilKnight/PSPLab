@@ -72,14 +72,11 @@ class MysqlConnector:
         return self.session.query(Course)
 
     def select_student_by_id(self, id: int):
-        return self.session.query(Student).filter_by(id=id).first()
+        return self.session.query(Student).filter_by(id=id)
 
     def select_course_by_id(self, id: int):
-        return self.session.query(Course).filter_by(id=id).first()
+        return self.session.query(Course).filter_by(id=id)
 
     def select_student_by_mail(self, mail: str):
-        return self.session.query(Student).filter_by(mail=mail).first()
-
-    def select_course_by_mail(self, mail: str):
-        return self.session.query(Course).filter_by(mail=mail).first()
+        return self.session.query(Student).filter_by(mail=mail)
 
