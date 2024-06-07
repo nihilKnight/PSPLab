@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="form-container">
+    <h2>Upload File</h2>
+    <form method="POST" enctype="multipart/form-data" action="{{ url_for('upload_file') }}">
+        {{ form.hidden_tag() }}
+        <div class="form-group">
+            {{ form.file.label }}<br>
+            {{ form.file }}<br>
+            {{ form.file.errors }}
+        </div>
+        <div class="form-group">
+            {{ form.submit(class_="btn btn-primary") }}
+        </div>
+    </form>
+</div>
+{% endblock %}
