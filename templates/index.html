@@ -1,0 +1,19 @@
+<head>
+    <link rel="icon" href="{{ url_for('static', filename='cat.ico') }}">
+</head>
+
+<body>
+
+    <p>
+        Welcome! {{ users | length }} users total.
+    </p>
+
+    <ul>
+        {% for user in users %}
+        <li> Hello! {{ user.name }}. </li>
+        {% endfor %}
+    </ul>
+
+</body>
+
+
