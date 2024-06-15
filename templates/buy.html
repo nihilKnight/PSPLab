@@ -1,0 +1,19 @@
+<head>
+    <link rel="icon" href="{{ url_for('static', filename='cat.ico') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}" type="text/css">
+</head>
+
+<body>
+
+    <h2>Buy {{ product.name }}</h2>
+
+    <form method="post">
+        Quantity <input type="number" name="amount" autocomplete="off" required>
+        <input class="btn" type="submit" name="submit" value="Buy">
+    </form>
+
+    <p>
+        <a href="{{ url_for('saler_detail', id=product.manager_id) }}">Cancel</a>
+    </p>
+
+</body>

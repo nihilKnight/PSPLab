@@ -1,0 +1,31 @@
+<head>
+    <link rel="icon" href="{{ url_for('static', filename='cat.ico') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}" type="text/css">
+</head>
+
+<body>
+
+    {% for message in get_flashed_messages() %}
+    <script>
+        alert("{{ message }}");
+    </script>
+    {% endfor %}
+
+    <form method="post">
+        Name <input type="text" name="name" autocomplete="off" required>
+        Account <input type="text" name="account" autocomplete="off" required>
+        Password <input type="password" name="password" autocomplete="off" required>
+        <label>
+            <input type="radio" name="type" value="Customer" required> Customer
+        </label>
+        <label>
+            <input type="radio" name="type" value="Saler" required> Saler
+        </label>
+        <input class="btn" type="submit" name="submit" value="Register">
+    </form>
+
+    <p>
+        Already have an account? <a href="{{ url_for('login') }}">Login</a>
+    </p>
+
+</body>

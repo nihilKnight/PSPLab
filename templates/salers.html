@@ -1,0 +1,19 @@
+<head>
+    <link rel="icon" href="{{ url_for('static', filename='cat.ico') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}" type="text/css">
+</head>
+
+<body>
+
+    <h2>Sales Agents</h2>
+
+    <ul>
+        {% for saler in salers %}
+        <li>
+            {{ saler.name }}
+            <a href="{{ url_for('saler_detail', id=saler.id) }}">View Products</a>
+        </li>
+        {% endfor %}
+    </ul>
+
+</body>

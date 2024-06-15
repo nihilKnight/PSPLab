@@ -1,0 +1,19 @@
+<head>
+    <link rel="icon" href="{{ url_for('static', filename='cat.ico') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}" type="text/css">
+</head>
+
+<body>
+
+    <h2>Products Managed by {{ saler.name }}</h2>
+
+    <ul>
+        {% for product in products %}
+        <li>
+            {{ product.name }} - ${{ product.price }} - {{ product.origin }} - Inventory: {{ product.inventory }}
+            <a href="{{ url_for('buy', product_id=product.id) }}">Buy</a>
+        </li>
+        {% endfor %}
+    </ul>
+
+</body>
