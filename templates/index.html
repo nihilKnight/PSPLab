@@ -13,10 +13,23 @@
 
     {% if current_user.is_authenticated %}
         <p>Hello, {{ current_user.name }}. <a href="{{ url_for('logout') }}">Logout</a></p>
+
+        <p><a href="{{ url_for('edit') }}">Edit Personal Profile</a></p>
+
+        {% if current_user.type == 'Customer' %}
+            <p><a href="{{ url_for('salers') }}">Check all salers</a></p>
+            <p><a href="{{ url_for('orders', id=current_user.id) }}">What I bought</a></p>
+        {% else %}
+            <p><a href="{{ url_for('products') }}">Check My products</a></p>
+            <p><a href="{{ url_for('orders', id=current_user.id) }}">What I sold</a></p>
+        {% endif %}
+
     {% else %}
         <p><a href="{{ url_for('login') }}">Login</a> or <a href="{{ url_for('register') }}">Register</a></p>
     {% endif %}
 
+
+    <!--
     <p>
         Welcome! {{ users | length }} users total.
     </p>
@@ -26,6 +39,7 @@
         <li> Hello! {{ user.name }}. </li>
         {% endfor %}
     </ul>
+    --!>
 
 </body>
 

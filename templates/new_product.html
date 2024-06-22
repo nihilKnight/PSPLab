@@ -5,6 +5,12 @@
 
 <body>
 
+    {% for message in get_flashed_messages() %}
+    <script>
+        alert("{{ message }}");
+    </script>
+    {% endfor %}
+
     <h2>New Product</h2>
 
     <form method="post">

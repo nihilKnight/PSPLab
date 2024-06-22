@@ -1,0 +1,25 @@
+<head>
+    <link rel="icon" href="{{ url_for('static', filename='cat.ico') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}" type="text/css">
+</head>
+
+<body>
+
+    {% if current_user.type == 'Customer' %}
+        <h2>Orders bought by {{ current_user.name }}</h2>
+    {% else %}
+        <h2>Orders sold by {{ current_user.name }}</h2>
+    {% endif %}
+
+    <ul>
+        {% for order in orders %}
+        <li>
+            {{ order.date }} - Saler {{ order.agent_id }} - Customer {{ order.buyer_id }} - Amount {{ order.amount }}
+        </li>
+        {% endfor %}
+    </ul>
+
+    <a href="{{ url_for('index') }}">Back</a>
+
+
+</body>

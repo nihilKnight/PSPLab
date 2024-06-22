@@ -5,6 +5,12 @@
 
 <body>
 
+    {% for message in get_flashed_messages() %}
+    <script>
+        alert("{{ message }}");
+    </script>
+    {% endfor %}
+
     <h2>Products Managed by {{ saler.name }}</h2>
 
     <ul>
@@ -15,5 +21,7 @@
         </li>
         {% endfor %}
     </ul>
+
+    <a href="{{ url_for('index') }}">Back</a>
 
 </body>

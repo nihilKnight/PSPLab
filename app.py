@@ -3,20 +3,29 @@ import click
 
 from flask import Flask, request, flash, render_template, redirect, url_for
 from flask_sqlalchemy import SQLAlchemy
-from flask_login import LoginManager, login_user, logout_user, login_required, current_user, UserMixin
+from flask_login import (
+        LoginManager, login_user, logout_user,
+        login_required, current_user, UserMixin)
 from werkzeug.security import generate_password_hash, check_password_hash
 
 
 app = Flask(__name__)
-app.config['SECRET_KEY'] = 'sk-f3e4a18e1d7834127f2add7d4ce85169d34de28e91eb24c1b82586bb001e55a1'
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:////' + os.path.join(app.root_path, 'db.sqlite')
+app.config['SECRET_KEY'] = 'sk-f3e4a18e1d7834127f2add7d4ce85169d34de28e91eb24c'
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:////'\
+        + os.path.join(app.root_path, 'db.sqlite')
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+app.config['UPLOAD_FOLDER'] = './static/uploads/'
 
 db = SQLAlchemy(app)
 
 login_manager = LoginManager()
 login_manager.init_app(app)
 login_manager.login_view = 'login'
+
+
+#####################
+#     DB Models     #
+#####################
 
 
 class User(db.Model, UserMixin):
@@ -26,10 +35,12 @@ class User(db.Model, UserMixin):
     password = db.Column(db.String(100), nullable=False)
     type = db.Column(db.String(10))  # 'Customer' or 'Saler'
 
+
 class Customer(User):
     __mapper_args__ = {
         'polymorphic_identity': 'Customer',
     }
+
 
 class Saler(User):
     __mapper_args__ = {
@@ -37,18 +48,21 @@ class Saler(User):
     }
     products = db.relationship('Product', back_populates='manager', lazy=True)
 
+
 class Product(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(100), nullable=False)
+    name = db.Column(db.String(100), unique=True, nullable=False)
     price = db.Column(db.Float, nullable=False)
     origin = db.Column(db.String(100), nullable=False)
     inventory = db.Column(db.Integer, nullable=False)
     manager_id = db.Column(db.Integer, db.ForeignKey('user.id'))
     manager = db.relationship('Saler', back_populates='products')
 
+
 class Order(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     date = db.Column(db.DateTime, default=db.func.current_timestamp())
+    name = db.Column(db.String(100), nullable=False)
     agent_id = db.Column(db.Integer, db.ForeignKey('user.id'))
     buyer_id = db.Column(db.Integer, db.ForeignKey('user.id'))
     amount = db.Column(db.Integer, nullable=False)
@@ -56,6 +70,10 @@ class Order(db.Model):
     agent = db.relationship('Saler', foreign_keys=[agent_id])
     buyer = db.relationship('Customer', foreign_keys=[buyer_id])
 
+
+###########################
+#     Routing Methods     #
+###########################
 
 
 @app.route("/", methods=['GET', 'POST'])
@@ -65,7 +83,7 @@ def index():
         title = request.form.get('title')
         year = request.form.get('year')
         user = User(name=title+year)
-        if len(User.query.filter(User.name==user.name).all()) > 0:
+        if len(User.query.filter(User.name == user.name).all()) > 0:
             flash('Name has been registered!')
             return redirect(url_for('index'))
 
@@ -74,8 +92,7 @@ def index():
         flash('Item created.')
         return redirect(url_for('index'))
 
-    users = User.query.all()
-    return render_template('index.html', users=users)
+    return render_template('index.html')
 
 
 @login_manager.user_loader
@@ -118,9 +135,19 @@ def register():
         user_type = request.form.get('type')
 
         if user_type == 'Customer':
-            user = Customer(name=name, account=account, password=generate_password_hash(password), type=user_type)
+            user = Customer(
+                    name=name,
+                    account=account,
+                    password=generate_password_hash(password),
+                    type=user_type
+                )
         elif user_type == 'Saler':
-            user = Saler(name=name, account=account, password=generate_password_hash(password), type=user_type)
+            user = Saler(
+                    name=name,
+                    account=account,
+                    password=generate_password_hash(password),
+                    type=user_type
+                )
 
         if User.query.filter_by(account=account).first():
             flash('Account has been registered!')
@@ -147,7 +174,7 @@ def edit():
         current_user.account = account
         if password:
             current_user.password = generate_password_hash(password)
-        
+
         db.session.commit()
         flash('Profile updated successfully.')
         return redirect(url_for('index'))
@@ -176,8 +203,14 @@ def new_product():
         price = request.form.get('price')
         origin = request.form.get('origin')
         inventory = request.form.get('inventory')
-        
-        product = Product(name=name, price=price, origin=origin, inventory=inventory, manager_id=current_user.id)
+
+        product = Product(
+                name=name,
+                price=price,
+                origin=origin,
+                inventory=inventory,
+                manager_id=current_user.id
+            )
         db.session.add(product)
         db.session.commit()
         flash('Product added successfully.')
@@ -254,7 +287,11 @@ def buy(product_id):
             return redirect(url_for('buy', product_id=product_id))
 
         product.inventory -= amount
-        order = Order(agent_id=product.manager_id, buyer_id=current_user.id, amount=amount)
+        order = Order(
+                agent_id=product.manager_id,
+                buyer_id=current_user.id,
+                amount=amount
+            )
         db.session.add(order)
         db.session.commit()
         flash('Purchase successful.')
@@ -263,9 +300,24 @@ def buy(product_id):
     return render_template('buy.html', product=product)
 
 
+@app.route("/orders/<int:id>")
+@login_required
+def orders(id):
+    if current_user.type == 'Customer':
+        orders = Order.query.filter_by(buyer_id=id).all()
+    else:
+        orders = Order.query.filter_by(agent_id=id).all()
+    return render_template('orders.html', orders=orders)
+
+
 @app.errorhandler(404)
 def page_not_found(e):
     return render_template('404.html'), 404
+
+
+################################
+#     Customed cli command     #
+################################
 
 
 @app.cli.command()
@@ -284,10 +336,79 @@ def forge():
     """Generate fake data."""
     db.create_all()
 
-    names = ['Alice', 'Bob', 'Eve', 'David']
+    customer = Customer(
+            name='Alice',
+            account='Alice',
+            password=generate_password_hash('Alice'),
+            type='Customer'
+        )
 
-    for name in names:
-        db.session.add(User(name=name))
+    saler1 = Saler(
+            name='Bob',
+            account='Bob',
+            password=generate_password_hash('Bob'),
+            type='Saler'
+        )
+
+    saler2 = Saler(
+            name='Eve',
+            account='Eve',
+            password=generate_password_hash('Eve'),
+            type='Saler'
+        )
+
+    db.session.add(customer)
+    db.session.add(saler1)
+    db.session.add(saler2)
+
     db.session.commit()
-    click.echo('Done.')
 
+    products = [
+            Product(
+                name='SpongeBob',
+                price=100,
+                origin='Pineapple House',
+                inventory=30,
+                manager_id=saler1.id
+            ),
+            Product(
+                name='Patrick Star ',
+                price=80,
+                origin='Pineapple House',
+                inventory=50,
+                manager_id=saler1.id
+            ),
+            Product(
+                name='Squidward Tentacles',
+                price=120,
+                origin='Pineapple House',
+                inventory=20,
+                manager_id=saler1.id
+            ),
+            Product(
+                name='Mr. Krabs',
+                price=85,
+                origin='Pineapple House',
+                inventory=28,
+                manager_id=saler2.id
+            ),
+        ]
+
+    for product in products:
+        db.session.add(product)
+    db.session.commit()
+
+    orders = [
+            Order(
+                name=product.name,
+                agent_id=product.manager_id,
+                buyer_id=customer.id,
+                amount=product.inventory//4
+            ) for product in products
+        ]
+
+    for order in orders:
+        db.session.add(order)
+    db.session.commit()
+
+    click.echo('Done.')

@@ -5,6 +5,12 @@
 
 <body>
 
+    {% for message in get_flashed_messages() %}
+    <script>
+        alert("{{ message }}");
+    </script>
+    {% endfor %}
+
     <form method="post">
         Name <input type="text" name="name" value="{{ current_user.name }}" autocomplete="off" required>
         Account <input type="text" name="account" value="{{ current_user.account }}" autocomplete="off" required>
