@@ -1,18 +1,17 @@
 FROM ubuntu:latest
 
-ADD . /app/flask_app
+WORKDIR /app
 
-WORKDIR /app/flask_app
+COPY . /app
 
-RUN apt-get update && apt-get -y install python3
+RUN apt-get update && apt-get -y install python3 python3-pip
 
-RUN python3 -m venv .venv
+EXPOSE 5000
 
-RUN source .venv/bin/activate
+CMD ["pip3", "install", "-r", "requirements.txt"]
 
-RUN pip install -r requirements.txt
+CMD ["python3", "-m", "flask", "initdb"]
 
-RUN flask initdb
+CMD ["python3", "-m", "flask", "forge"]
 
-RUN flask run
-
+ENTRYPOINT ["python3", "-m", "flask", "run"]
