@@ -9,12 +9,17 @@ from flask_login import (
 from werkzeug.security import generate_password_hash, check_password_hash
 
 
+######################
+#     Setting Up     #
+######################
+
+
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'sk-f3e4a18e1d7834127f2add7d4ce85169d34de28e91eb24c'
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:////'\
         + os.path.join(app.root_path, 'db.sqlite')
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-app.config['UPLOAD_FOLDER'] = './static/uploads/'
+# app.config['UPLOAD_FOLDER'] = './static/uploads/'
 
 db = SQLAlchemy(app)
 
@@ -288,6 +293,7 @@ def buy(product_id):
 
         product.inventory -= amount
         order = Order(
+                name=product.name,
                 agent_id=product.manager_id,
                 buyer_id=current_user.id,
                 amount=amount
