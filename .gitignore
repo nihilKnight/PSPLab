@@ -2,6 +2,7 @@
 **/.vscode/
 **/.venv/
 
+demo.py
 
 *.sqlite
 
