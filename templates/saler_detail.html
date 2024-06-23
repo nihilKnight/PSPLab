@@ -19,6 +19,10 @@
             {{ product.name }} - ${{ product.price }} - {{ product.origin }} - Inventory: {{ product.inventory }}
             <a href="{{ url_for('buy', product_id=product.id) }}">Buy</a>
         </li>
+        {% if product.image %}
+                <img src="{{ url_for('static', filename='uploads/' + product.image) }}" alt="{{ product.name }}" width="100">
+                <a href="{{ url_for('static', filename='uploads/' + product.image) }}" download>Download Image</a>
+        {% endif %}
         {% endfor %}
     </ul>
 

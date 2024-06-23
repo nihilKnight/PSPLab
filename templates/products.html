@@ -23,6 +23,14 @@
             <a href="{{ url_for('edit_product', id=product.id) }}">Edit</a>
             <a href="{{ url_for('delete_product', id=product.id) }}">Delete</a>
         </li>
+            {% if product.image %}
+                    <img src="{{ url_for('static', filename='uploads/' + product.image) }}" alt="{{ product.name }}" width="100">
+                    <a href="{{ url_for('static', filename='uploads/' + product.image) }}" download>Download Image</a>
+            {% endif %}
+        <form action="{{ url_for('upload_image', product_id=product.id) }}" method="post" enctype="multipart/form-data">
+            <input type="file" name="image" accept="image/*" required>
+            <input class="btn" type="submit" name="submit" value="Upload Image">
+        </form>
         {% endfor %}
 
     </ul>

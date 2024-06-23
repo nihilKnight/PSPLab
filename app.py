@@ -7,6 +7,7 @@ from flask_login import (
         LoginManager, login_user, logout_user,
         login_required, current_user, UserMixin)
 from werkzeug.security import generate_password_hash, check_password_hash
+from werkzeug.utils import secure_filename
 
 
 ######################
@@ -19,13 +20,27 @@ app.config['SECRET_KEY'] = 'sk-f3e4a18e1d7834127f2add7d4ce85169d34de28e91eb24c'
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:////'\
         + os.path.join(app.root_path, 'db.sqlite')
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-# app.config['UPLOAD_FOLDER'] = './static/uploads/'
+app.config['UPLOAD_FOLDER'] = os.path.join(app.root_path, 'static', 'uploads')
+# max upload size: 16MB
+app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024
+
+ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif'}
 
 db = SQLAlchemy(app)
 
 login_manager = LoginManager()
 login_manager.init_app(app)
 login_manager.login_view = 'login'
+
+
+#################
+#     Utils     #
+#################
+
+
+def allowed_file(filename):
+    return '.' in filename and filename.rsplit('.', 1)[1].lower()\
+            in ALLOWED_EXTENSIONS
 
 
 #####################
@@ -62,6 +77,7 @@ class Product(db.Model):
     inventory = db.Column(db.Integer, nullable=False)
     manager_id = db.Column(db.Integer, db.ForeignKey('user.id'))
     manager = db.relationship('Saler', back_populates='products')
+    image = db.Column(db.String(200))
 
 
 class Order(db.Model):
@@ -259,6 +275,39 @@ def delete_product(id):
     return redirect(url_for('products'))
 
 
+@app.route("/upload_image/<int:product_id>", methods=['POST'])
+@login_required
+def upload_image(product_id):
+    product = Product.query.get_or_404(product_id)
+    if product.manager_id != current_user.id:
+        flash('You do not have access to this page.')
+        return redirect(url_for('products'))
+
+    if 'image' not in request.files:
+        flash('No file part')
+        return redirect(url_for('products'))
+
+    file = request.files['image']
+
+    if file.filename == '':
+        flash('No selected file')
+        return redirect(url_for('products'))
+
+    if file and allowed_file(file.filename):
+        filename = secure_filename(file.filename)
+        filepath = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+        file.save(filepath)
+
+        product.image = filename
+        db.session.commit()
+
+        flash('Image uploaded successfully.')
+        return redirect(url_for('products'))
+    else:
+        flash('File type not allowed.')
+        return redirect(url_for('products'))
+
+
 @app.route("/salers")
 @login_required
 def salers():
@@ -375,28 +424,32 @@ def forge():
                 price=100,
                 origin='Pineapple House',
                 inventory=30,
-                manager_id=saler1.id
+                manager_id=saler1.id,
+                image='spongeBob.jpeg'
             ),
             Product(
                 name='Patrick Star ',
                 price=80,
                 origin='Pineapple House',
                 inventory=50,
-                manager_id=saler1.id
+                manager_id=saler1.id,
+                image='patrickStar.jpeg'
             ),
             Product(
                 name='Squidward Tentacles',
                 price=120,
                 origin='Pineapple House',
                 inventory=20,
-                manager_id=saler1.id
+                manager_id=saler1.id,
+                image='squidwardTentacles.jpeg'
             ),
             Product(
                 name='Mr. Krabs',
                 price=85,
                 origin='Pineapple House',
                 inventory=28,
-                manager_id=saler2.id
+                manager_id=saler2.id,
+                image='MrKrabs.jpeg'
             ),
         ]
 
