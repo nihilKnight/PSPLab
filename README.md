@@ -15,14 +15,7 @@ This web app features:
 
 ## QuickStart
 
-1. Via `Docker`:
-
-```shell
-$ docker build . -t flask_app:v1
-$ docker run -p 5000:your_local_port flask_app:v1
-```
-
-2. Via Virtual Environment:
+1. Via Virtual Environment:
 
 ```shell
 $ python3 -m venv .venv
