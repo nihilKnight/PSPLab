@@ -11,11 +11,22 @@
     </script>
     {% endfor %}
 
-    <form method="post">
-        Account <input type="text" name="account" autocomplete="off" required>
-        Password <input type="password" name="password" autocomplete="off" required>
-        <input class="btn" type="submit" name="submit" value="Login">
+    <form action="/login" method="post">
+        <label for="username">Username:</label>
+        <input type="text" id="username" name="username">
+        <label for="password">Password:</label>
+        <input type="password" id="password" name="password"><br><br>
+        <img src="/captcha" alt="captcha"><br>
+        <label for="captcha">Captcha:</label>
+        <input type="text" id="captcha" name="captcha">
+        <button type="button" onclick="refreshCaptcha()">Refresh</button><br><br>
+        <button type="submit">Login</button>
     </form>
+    <script>
+        function refreshCaptcha() {
+            document.querySelector('img[alt="captcha"]').src = '/captcha?' + new Date().getTime();
+        }
+    </script>
 
     <p>
         Don't have an account? <a href="{{ url_for('register') }}">Register</a>

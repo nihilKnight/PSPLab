@@ -1,7 +1,14 @@
 import os
 import click
+import random
+import string
 
-from flask import Flask, request, flash, render_template, redirect, url_for
+from io import BytesIO
+from PIL import Image, ImageDraw, ImageFont
+
+from flask import (
+        Flask, request, flash, render_template,
+        redirect, url_for, session, send_file)
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import (
         LoginManager, login_user, logout_user,
@@ -36,6 +43,27 @@ login_manager.login_view = 'login'
 #################
 #     Utils     #
 #################
+
+
+def generate_captcha():
+    characters = string.ascii_uppercase + string.digits
+    captcha_text = ''.join(random.choice(characters) for _ in range(6))
+    session['captcha'] = captcha_text
+
+    # Create image with white background
+    image = Image.new('RGB', (180, 60), 'white')
+    font = ImageFont.truetype("static/fonts/arial.ttf", 40)
+    draw = ImageDraw.Draw(image)
+
+    # Draw the captcha text on the image
+    draw.text((10, 10), captcha_text, font=font, fill='black')
+
+    # Save image to a bytes buffer
+    buffer = BytesIO()
+    image.save(buffer, 'jpeg')
+    buffer.seek(0)
+
+    return buffer
 
 
 def allowed_file(filename):
@@ -126,6 +154,11 @@ def login():
     if request.method == 'POST':
         account = request.form.get('account')
         password = request.form.get('password')
+        captcha = request.form.get('captcha')
+
+        if captcha.lower() != session.get('captcha', '').lower():
+            flash('Invalid captcha', 'error')
+            return redirect(url_for('login'))
 
         user = User.query.filter_by(account=account).first()
         if user and check_password_hash(user.password, password):
@@ -363,6 +396,12 @@ def orders(id):
     else:
         orders = Order.query.filter_by(agent_id=id).all()
     return render_template('orders.html', orders=orders)
+
+
+@app.route('/captcha')
+def captcha():
+    buffer = generate_captcha()
+    return send_file(buffer, mimetype='image/jpeg')
 
 
 @app.errorhandler(404)
