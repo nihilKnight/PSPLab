@@ -50,15 +50,12 @@ def generate_captcha():
     captcha_text = ''.join(random.choice(characters) for _ in range(6))
     session['captcha'] = captcha_text
 
-    # Create image with white background
     image = Image.new('RGB', (180, 60), 'white')
     font = ImageFont.truetype("static/fonts/arial.ttf", 40)
     draw = ImageDraw.Draw(image)
 
-    # Draw the captcha text on the image
     draw.text((10, 10), captcha_text, font=font, fill='black')
 
-    # Save image to a bytes buffer
     buffer = BytesIO()
     image.save(buffer, 'jpeg')
     buffer.seek(0)
